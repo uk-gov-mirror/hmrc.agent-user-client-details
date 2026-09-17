@@ -21,13 +21,15 @@ import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import play.api.Logging
+import play.api.mvc.Request
 import uk.gov.hmrc.agentuserclientdetails.connectors.EmailConnector
 import uk.gov.hmrc.agentuserclientdetails.model.EmailInformation
 import uk.gov.hmrc.agentuserclientdetails.model.FriendlyNameJobData
 import uk.gov.hmrc.agentuserclientdetails.model.FriendlyNameWorkItem
 import uk.gov.hmrc.agentuserclientdetails.model.JobData
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.SessionId
+import uk.gov.hmrc.http.HeaderNames
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.*
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
@@ -93,7 +95,11 @@ extends Logging {
           case true =>
             logger.info(s"Job monitor: Job ${workItem.id} has finished.")
 
-            given HeaderCarrier = HeaderCarrier().copy(sessionId = job.sessionId.map(SessionId.apply))
+            given Request[Any] =
+              job.sessionId match {
+                case Some(sessionId) => NoRequest(Map(HeaderNames.xSessionId -> sessionId))
+                case None => NoRequest
+              }
 
             for {
               _ <- jobMonitoringService.markAsFinished(workItem.id)

@@ -25,6 +25,7 @@ import play.api.http.Status.*
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.ws.BodyWritable
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.BaseIntegrationSpec
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
@@ -32,6 +33,8 @@ import uk.gov.hmrc.agentuserclientdetails.model.GroupDelegatedEnrolments
 import uk.gov.hmrc.agentuserclientdetails.model.PaginatedEnrolments
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.*
 import uk.gov.hmrc.agentuserclientdetails.stubs.HttpClientStub
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
+import uk.gov.hmrc.agentuserclientdetails.util.RequestSupport.hc
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpException
@@ -52,7 +55,7 @@ extends BaseIntegrationSpec
 with HttpClientStub
 with MockFactory {
 
-  given HeaderCarrier = HeaderCarrier()
+  given RequestHeader = NoRequest
 
   lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   given AppConfig = appConfig

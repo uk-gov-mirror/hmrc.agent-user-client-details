@@ -18,13 +18,13 @@ package uk.gov.hmrc.agentuserclientdetails.connectors
 
 import com.google.inject.ImplementedBy
 import com.google.inject.Inject
-import play.api.Logging
 import play.api.http.HeaderNames
 import play.api.http.Status
 import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.MtdItId
 import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.Urn
 import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.Utr
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -62,7 +62,7 @@ class HipConnectorImpl @Inject() (
   clock: Clock
 )(using val ec: ExecutionContext)
 extends HipConnector
-with Logging {
+with RequestAwareLogging {
 
   /** API number: API#5266 Itsa Taxpayer Business Details https://admin.tax.service.gov.uk/integration-hub/apis/details/e54e8843-c146-4551-a499-c93ecac4c6fd
     */

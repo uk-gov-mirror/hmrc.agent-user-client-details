@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentuserclientdetails.services
 
-import play.api.Logging
 import uk.gov.hmrc.agentuserclientdetails.model.Service.*
 import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.CgtRef
 import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.MtdItId
@@ -32,6 +31,7 @@ import uk.gov.hmrc.agentuserclientdetails.connectors.HipConnector
 import uk.gov.hmrc.agentuserclientdetails.connectors.IfConnector
 import uk.gov.hmrc.agentuserclientdetails.connectors.TradingDetails
 import uk.gov.hmrc.agentuserclientdetails.model.VatCustomerDetails
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -50,7 +50,7 @@ class ClientNameService @Inject() (
   appConfig: AppConfig
 )
 extends AnyRef
-with Logging {
+with RequestAwareLogging {
 
   def getClientName(enrolmentKey: String)(using
     hc: HeaderCarrier,

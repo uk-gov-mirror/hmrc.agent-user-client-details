@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentuserclientdetails.connectors
 
 import com.google.inject.ImplementedBy
-import play.api.Logging
 import play.api.http.Status.NOT_FOUND
 import play.api.http.Status.OK
 import play.utils.UriEncoding
@@ -25,6 +24,7 @@ import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.*
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.model.CgtSubscription
 import uk.gov.hmrc.agentuserclientdetails.model.VatCustomerDetails
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.*
@@ -69,7 +69,7 @@ class DesConnectorImpl @Inject() (
 )(using val ec: ExecutionContext)
 extends DesConnector
 with HttpErrorFunctions
-with Logging {
+with RequestAwareLogging {
 
   private val baseUrl: String = appConfig.desBaseUrl
 

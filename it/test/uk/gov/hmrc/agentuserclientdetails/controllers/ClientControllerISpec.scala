@@ -25,6 +25,7 @@ import play.api.http.HttpEntity.NoEntity
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.contentAsJson
 import play.api.test.Helpers.defaultAwaitTimeout
@@ -52,12 +53,13 @@ import java.time.Instant
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import ch.qos.logback.classic.Level
-import ch.qos.logback.classic.{Logger => LBLogger}
+import ch.qos.logback.classic.Logger as LBLogger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
 import org.slf4j.LoggerFactory
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
+
 import scala.jdk.CollectionConverters.*
 
 class ClientControllerISpec
@@ -79,7 +81,7 @@ with MongoSupport {
   lazy val jobMonitoringRepository = new JobMonitoringRepository(mongoComponent, config)
   lazy val jobMonitoringService = new JobMonitoringServiceImpl(jobMonitoringRepository, appConfig)
 
-  given HeaderCarrier = HeaderCarrier()
+  given RequestHeader = NoRequest
   val testGroupId = "2K6H-N1C1-7M7V-O4A3"
   val anotherTestGroupId = "8R6G-J5B5-0U1Q-N8R2"
   val testArn = Arn("BARN9706518")
@@ -155,12 +157,12 @@ with MongoSupport {
       clients: Seq[Client]
     ): CallHandler3[
       String,
-      HeaderCarrier,
+      RequestHeader,
       ExecutionContext,
       Future[Seq[Client]]
     ] =
       (es3CacheService
-        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(*, *, *)
         .returning(Future.successful(clients))
 
@@ -168,12 +170,12 @@ with MongoSupport {
       errorResponse: UpstreamErrorResponse
     ): CallHandler3[
       String,
-      HeaderCarrier,
+      RequestHeader,
       ExecutionContext,
       Future[Seq[Client]]
     ] =
       (es3CacheService
-        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(*, *, *)
         .returning(Future.failed(errorResponse))
 
@@ -181,12 +183,12 @@ with MongoSupport {
       result: Option[Unit]
     ): CallHandler3[
       String,
-      HeaderCarrier,
+      RequestHeader,
       ExecutionContext,
       Future[Option[Unit]]
     ] =
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(*, *, *)
         .returning(Future successful result)
 
@@ -560,7 +562,7 @@ with MongoSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       mockGetPrincipalGroupIdSuccess(Some(testGroupId))
       (es3CacheService
-        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(
           testGroupId,
           *,
@@ -601,7 +603,7 @@ with MongoSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       mockGetPrincipalGroupIdSuccess(Some(testGroupId))
       (es3CacheService
-        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(
           testGroupId,
           *,
@@ -648,7 +650,7 @@ with MongoSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       mockGetPrincipalGroupIdSuccess(Some(testGroupId))
       (es3CacheService
-        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(
           testGroupId,
           *,
@@ -692,7 +694,7 @@ with MongoSupport {
       mockGetPrincipalGroupIdSuccess(Some(testGroupId))
 
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(
           testGroupId,
           *,
@@ -733,7 +735,7 @@ with MongoSupport {
       mockGetPrincipalGroupIdSuccess(Some(testGroupId))
 
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(
           testGroupId,
           *,
@@ -774,7 +776,7 @@ with MongoSupport {
       mockGetPrincipalGroupIdSuccess(Some(testGroupId))
 
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(
           testGroupId,
           *,

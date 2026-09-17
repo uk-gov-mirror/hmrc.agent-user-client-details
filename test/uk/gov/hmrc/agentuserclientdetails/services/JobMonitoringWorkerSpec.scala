@@ -24,6 +24,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Client
 import uk.gov.hmrc.agentuserclientdetails.connectors.EmailConnector
 import uk.gov.hmrc.agentuserclientdetails.model.EmailInformation
@@ -124,7 +125,7 @@ with MockFactory {
 
       val es3CacheService = stub[ES3CacheService]
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .when(groupId, *, *)
         .returns(Future.successful(Some(())))
 
@@ -185,7 +186,7 @@ with MockFactory {
 
       val es3CacheService = stub[ES3CacheService]
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .when(groupId, *, *)
         .returns(Future.successful(Some(())))
 
@@ -239,7 +240,7 @@ with MockFactory {
 
       val es3CacheService = stub[ES3CacheService]
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .when(groupId, *, *)
         .returns(Future.successful(Some(())))
 
@@ -294,7 +295,7 @@ with MockFactory {
 
       val es3CacheService = stub[ES3CacheService]
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .when(groupId, *, *)
         .returns(Future.successful(Some(())))
 
@@ -359,7 +360,7 @@ with MockFactory {
 
       val es3CacheService = stub[ES3CacheService]
       (es3CacheService
-        .refreshIfGroupIdExist(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .refreshIfGroupIdExist(_: String)(using _: RequestHeader, _: ExecutionContext))
         .when(groupId, *, *)
         .returns(Future.successful(Some(())))
 

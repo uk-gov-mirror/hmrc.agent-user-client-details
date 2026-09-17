@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentuserclientdetails.stubs
 import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.TestSuite
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.connectors.UsersGroupsSearchConnector
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.UserDetails
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -33,12 +33,12 @@ extends MockFactory { suite: TestSuite =>
 
   def mockGetGroupUsersSuccess(userDetails: Seq[UserDetails]): CallHandler3[
     String,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Seq[UserDetails]]
   ] =
     (mockUsersGroupsSearchConnector
-      .getGroupUsers(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+      .getGroupUsers(_: String)(using _: RequestHeader, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.successful(userDetails))
 

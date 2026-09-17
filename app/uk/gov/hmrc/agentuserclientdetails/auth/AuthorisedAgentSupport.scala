@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.agentuserclientdetails.auth
 
-import play.api.Logging
 import play.api.mvc.Results.Forbidden
 import play.api.mvc.Request
 import play.api.mvc.Result
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 trait AuthorisedAgentSupport
-extends Logging {
+extends RequestAwareLogging {
 
   def withAuthorisedAgent[T](allowStandardUser: Boolean = false)(
     body: AuthorisedAgent => Future[Result]

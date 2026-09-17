@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentuserclientdetails.stubs
 import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.TestSuite
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Enrolment
@@ -34,63 +35,63 @@ extends MockFactory { suite: TestSuite =>
 
   def mockGetPrincipalGroupIdSuccess(groupId: Option[String]): CallHandler3[
     Arn,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Option[String]]
   ] =
     (mockEnrolmentStoreProxyConnector
-      .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+      .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.successful(groupId))
 
   def mockGetPrincipalGroupIdException(ex: Exception): CallHandler3[
     Arn,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Option[String]]
   ] =
     (mockEnrolmentStoreProxyConnector
-      .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+      .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.failed(ex))
 
   def mockGetEnrolmentsForGroupIdSuccess(enrolments: Seq[Enrolment]): CallHandler3[
     String,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Seq[Enrolment]]
   ] =
     (mockEnrolmentStoreProxyConnector
-      .getEnrolmentsForGroupId(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+      .getEnrolmentsForGroupId(_: String)(using _: RequestHeader, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.successful(enrolments))
 
   def mockGetEnrolmentsForGroupIdException(ex: Exception): CallHandler3[
     String,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Seq[Enrolment]]
   ] =
     (mockEnrolmentStoreProxyConnector
-      .getEnrolmentsForGroupId(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+      .getEnrolmentsForGroupId(_: String)(using _: RequestHeader, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.failed(ex))
 
   def mockGetEnrolmentsAssignedToUserSuccess(enrolments: Seq[Enrolment]): CallHandler3[
     String,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Seq[Enrolment]]
-  ] = (mockEnrolmentStoreProxyConnector.getEnrolmentsAssignedToUser(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+  ] = (mockEnrolmentStoreProxyConnector.getEnrolmentsAssignedToUser(_: String)(using _: RequestHeader, _: ExecutionContext))
     .expects(*, *, *)
     .returns(Future.successful(enrolments))
 
   def mockGetEnrolmentsAssignedToUserException(ex: Exception): CallHandler3[
     String,
-    HeaderCarrier,
+    RequestHeader,
     ExecutionContext,
     Future[Seq[Enrolment]]
-  ] = (mockEnrolmentStoreProxyConnector.getEnrolmentsAssignedToUser(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+  ] = (mockEnrolmentStoreProxyConnector.getEnrolmentsAssignedToUser(_: String)(using _: RequestHeader, _: ExecutionContext))
     .expects(*, *, *)
     .returns(Future.failed(ex))
 

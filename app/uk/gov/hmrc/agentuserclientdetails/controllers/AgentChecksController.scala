@@ -20,6 +20,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.ControllerComponents
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
 import uk.gov.hmrc.agentuserclientdetails.auth.AuthAction
@@ -100,7 +101,7 @@ with AuthorisedAgentSupport {
     } transformWith failureHandler
   }
 
-  private def failureHandler(triedResult: Try[Result]): Future[Result] =
+  private def failureHandler(triedResult: Try[Result])(using rh: RequestHeader): Future[Result] =
     triedResult match {
       case Success(result) => Future.successful(result)
       case Failure(uer: UpstreamErrorResponse) if uer.statusCode == NOT_FOUND =>

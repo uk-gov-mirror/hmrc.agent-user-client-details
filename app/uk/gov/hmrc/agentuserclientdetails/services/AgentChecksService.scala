@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentuserclientdetails.services
 
-import play.api.Logging
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.UserDetails
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentuserclientdetails.connectors.EnrolmentStoreProxyConnecto
 import uk.gov.hmrc.agentuserclientdetails.connectors.UsersGroupsSearchConnector
 import uk.gov.hmrc.agentuserclientdetails.repositories.AgentSize
 import uk.gov.hmrc.agentuserclientdetails.repositories.AgentSizeRepository
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.*
 
@@ -44,7 +44,7 @@ class AgentChecksService @Inject() (
   workItemService: FriendlyNameWorkItemService,
   assignmentsWorkItemService: AssignmentsWorkItemService
 )
-extends Logging {
+extends RequestAwareLogging {
 
   private val outstandingProcessingStatuses: Set[ProcessingStatus] = Set(
     ToDo,
@@ -55,7 +55,7 @@ extends Logging {
 
   def getAgentSize(arn: Arn)(using
     ec: ExecutionContext,
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[Option[AgentSize]] =
     agentSizeRepository.get(arn) flatMap {
       case Some(agentSize) if withinRefreshDuration(agentSize.refreshedDateTime) => Future.successful(Option(agentSize))
@@ -71,7 +71,7 @@ extends Logging {
     }
   def userCheck(arn: Arn)(using
     ec: ExecutionContext,
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[Int] =
     for {
       maybeGroupId <- enrolmentStoreProxyConnector.getPrincipalGroupIdFor(arn)
@@ -84,7 +84,7 @@ extends Logging {
 
   def outstandingWorkItemsExist(arn: Arn)(using
     ec: ExecutionContext,
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[Boolean] =
     for {
       maybeGroupId <- enrolmentStoreProxyConnector.getPrincipalGroupIdFor(arn)
@@ -110,7 +110,7 @@ extends Logging {
 
   def getTeamMembers(arn: Arn)(using
     ec: ExecutionContext,
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[Seq[UserDetails]] =
     for {
       maybeGroupId <- enrolmentStoreProxyConnector.getPrincipalGroupIdFor(arn)
@@ -127,7 +127,7 @@ extends Logging {
 
   private def fetchClientCount(arn: Arn)(using
     ec: ExecutionContext,
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[Option[Int]] =
     for {
       maybeGroupId <- enrolmentStoreProxyConnector.getPrincipalGroupIdFor(arn)
@@ -144,7 +144,10 @@ extends Logging {
   private def saveAgentSize(
     arn: Arn,
     clientCount: Int
-  )(using ec: ExecutionContext): Future[Option[AgentSize]] = {
+  )(using
+    ec: ExecutionContext,
+    rh: RequestHeader
+  ): Future[Option[AgentSize]] = {
     val agentSize = AgentSize(
       arn,
       clientCount,

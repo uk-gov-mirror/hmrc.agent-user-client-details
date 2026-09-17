@@ -22,7 +22,8 @@ import uk.gov.hmrc.http.HeaderNames
 import uk.gov.hmrc.http.RequestId
 import uk.gov.hmrc.http.SessionId
 
-class CommonHeadersSpec extends BaseSpec {
+class CommonHeadersSpec
+extends BaseSpec {
 
   "CommonHeaders" should {
     "include request and session identifiers from the HeaderCarrier" in {

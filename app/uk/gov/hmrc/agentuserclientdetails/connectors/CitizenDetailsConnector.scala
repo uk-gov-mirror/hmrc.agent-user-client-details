@@ -17,10 +17,10 @@
 package uk.gov.hmrc.agentuserclientdetails.connectors
 
 import com.google.inject.ImplementedBy
-import play.api.Logging
 import play.api.http.Status
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.model.Citizen
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -53,7 +53,7 @@ class CitizenDetailsConnectorImpl @Inject() (
   val ec: ExecutionContext
 )
 extends CitizenDetailsConnector
-with Logging {
+with RequestAwareLogging {
 
   private val baseUrl = appConfig.citizenDetailsBaseUrl
 

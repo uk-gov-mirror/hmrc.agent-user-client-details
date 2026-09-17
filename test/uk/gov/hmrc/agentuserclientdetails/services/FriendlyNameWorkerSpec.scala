@@ -24,6 +24,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Client
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.connectors.EnrolmentStoreProxyConnector
@@ -141,7 +142,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
 
@@ -163,7 +164,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -203,7 +204,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
 
@@ -225,7 +226,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -265,7 +266,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
 
@@ -287,7 +288,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -327,7 +328,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(
           testGroupId,
           *,
@@ -355,7 +356,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -395,7 +396,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(
           testGroupId,
           *,
@@ -423,7 +424,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -463,7 +464,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(
           testGroupId,
           *,
@@ -492,7 +493,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -540,7 +541,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.failed(UpstreamErrorResponse("", 429)))
 
@@ -601,7 +602,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
 
@@ -626,7 +627,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,
@@ -666,7 +667,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.failed(UpstreamErrorResponse(
           s"Unexpected status on ES19 request: INVALID_JSON",
@@ -695,7 +696,7 @@ with MockFactory {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .verify(
           testGroupId,
           *,

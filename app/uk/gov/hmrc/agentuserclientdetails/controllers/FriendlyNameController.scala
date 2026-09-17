@@ -30,7 +30,6 @@ import uk.gov.hmrc.agentuserclientdetails.model.UpdateFriendlyNameRequest
 import uk.gov.hmrc.agentuserclientdetails.services.FriendlyNameWorkItemService
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.SensitiveClient
 import uk.gov.hmrc.agentuserclientdetails.util.StatusUtil
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.ToDo
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -137,7 +136,7 @@ with AuthorisedAgentSupport {
   private def withGroupIdForArn(
     arn: Arn
   )(f: String => Future[Result])(using
-    c: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Result] = espConnector.getPrincipalGroupIdFor(arn).flatMap {
     case Some(groupId) => f(groupId)

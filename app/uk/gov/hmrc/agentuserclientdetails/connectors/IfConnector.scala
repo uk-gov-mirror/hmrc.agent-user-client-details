@@ -17,13 +17,13 @@
 package uk.gov.hmrc.agentuserclientdetails.connectors
 
 import com.google.inject.ImplementedBy
-import play.api.Logging
 import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Reads.*
 import play.utils.UriEncoding
 import uk.gov.hmrc.agentuserclientdetails.model.clientidtypes.*
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.model.PptSubscription
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.*
@@ -67,7 +67,7 @@ class IfConnectorImpl @Inject() (
 )(using val ec: ExecutionContext)
 extends IfConnector
 with HttpErrorFunctions
-with Logging {
+with RequestAwareLogging {
 
   private val baseUrl: String = appConfig.ifPlatformBaseUrl
 

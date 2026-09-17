@@ -356,7 +356,7 @@ with AuthorisedAgentSupport {
     sendEmail: Boolean,
     lang: String // 'en' or 'cy' -- defaults to 'en' if invalid
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Option[ObjectId]] =
     if (toBeAdded.isEmpty)

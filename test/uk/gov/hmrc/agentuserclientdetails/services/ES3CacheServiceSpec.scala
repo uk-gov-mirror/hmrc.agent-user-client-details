@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentuserclientdetails.services
 
 import org.scalamock.handlers.CallHandler1
-import org.scalamock.handlers.CallHandler2
 import org.scalamock.handlers.CallHandler3
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Enrolment
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Identifier
@@ -27,8 +26,10 @@ import uk.gov.hmrc.agentuserclientdetails.connectors.EnrolmentStoreProxyConnecto
 import uk.gov.hmrc.agentuserclientdetails.repositories.Es3CacheRepository
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.Es3Cache
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.SensitiveEnrolment
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import play.api.mvc.RequestHeader
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -120,7 +121,7 @@ extends BaseSpec {
     val groupId = "0R4C-G0G1-4M9Y-T7P0"
 
     given ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-    given HeaderCarrier = HeaderCarrier()
+    given RequestHeader = NoRequest
 
     def mockEs3CacheRepositoryFetch(maybeEs3Cache: Option[Es3Cache]): CallHandler1[String, Future[Option[Es3Cache]]] =
       (mockEs3CacheRepository
@@ -128,26 +129,31 @@ extends BaseSpec {
         .expects(groupId)
         .returning(Future successful maybeEs3Cache)
 
-    def mockEs3CacheRepositorySave(enrolments: Seq[Enrolment]): CallHandler2[
+    def mockEs3CacheRepositorySave(enrolments: Seq[Enrolment]): CallHandler3[
       String,
       Seq[Enrolment],
+      RequestHeader,
       Future[Es3Cache]
     ] =
       (mockEs3CacheRepository
-        .put(_: String, _: Seq[Enrolment]))
-        .expects(groupId, enrolments)
+        .put(_: String, _: Seq[Enrolment])(using _: RequestHeader))
+        .expects(
+          groupId,
+          enrolments,
+          *
+        )
         .returning(Future.successful(Es3Cache(groupId, enrolments.map(SensitiveEnrolment(_)))))
 
     def mockEnrolmentStoreProxyConnectorGetEnrolmentsForGroupId(
       enrolments: Seq[Enrolment]
     ): CallHandler3[
       String,
-      HeaderCarrier,
+      RequestHeader,
       ExecutionContext,
       Future[Seq[Enrolment]]
     ] =
       (mockEnrolmentStoreProxyConnector
-        .getEnrolmentsForGroupId(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+        .getEnrolmentsForGroupId(_: String)(using _: RequestHeader, _: ExecutionContext))
         .expects(groupId, *, *)
         .returning(Future successful enrolments)
 

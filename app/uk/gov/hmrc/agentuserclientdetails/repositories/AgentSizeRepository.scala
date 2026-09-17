@@ -22,11 +22,11 @@ import com.mongodb.client.model.ReplaceOptions
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.IndexModel
 import org.mongodb.scala.model.Indexes.ascending
-import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
 import uk.gov.hmrc.agentuserclientdetails.repositories.UpsertType.*
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
@@ -70,7 +70,7 @@ extends PlayMongoRepository[AgentSize](
   )
 )
 with AgentSizeRepository
-with Logging {
+with RequestAwareLogging {
 
   // TODO maybe rework this repo to include a TTL instead of a refresh duration.
   override lazy val requiresTtlIndex = false

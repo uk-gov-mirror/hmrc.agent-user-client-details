@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentuserclientdetails.services
 
 import org.bson.types.ObjectId
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Client
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.UserDetails
@@ -30,6 +31,7 @@ import uk.gov.hmrc.agentuserclientdetails.model.Operation.*
 import uk.gov.hmrc.agentuserclientdetails.repositories.*
 import uk.gov.hmrc.agentuserclientdetails.repositories.UpsertType.*
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.SensitiveClient
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.agentuserclientdetails.support.TestAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.*
@@ -45,7 +47,7 @@ class AgentChecksServiceSpec
 extends BaseSpec {
 
   given ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  given HeaderCarrier = HeaderCarrier()
+  given RequestHeader = NoRequest
 
   val refreshdurationConfigKey = "agentsize.refreshduration"
 
@@ -505,7 +507,7 @@ extends BaseSpec {
     maybeGroupId: Option[String]
   )(mockEnrolmentStoreProxyConnector: EnrolmentStoreProxyConnector) =
     (mockEnrolmentStoreProxyConnector
-      .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+      .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
       .expects(arn, *, *)
       .returning(Future.successful(maybeGroupId))
 
@@ -513,7 +515,7 @@ extends BaseSpec {
     clients: Seq[Client]
   )(mockES3CacheService: ES3CacheService) =
     (mockES3CacheService
-      .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+      .fetchClientsAndPoupluateCacheIfEmpty(_: String)(using _: RequestHeader, _: ExecutionContext))
       .expects(groupId, *, *)
       .returning(Future.successful(clients))
 
@@ -525,7 +527,7 @@ extends BaseSpec {
     seqUserDetail: Seq[UserDetails]
   )(mockUsersGroupsSearchConnector: UsersGroupsSearchConnector) =
     (mockUsersGroupsSearchConnector
-      .getGroupUsers(_: String)(using _: HeaderCarrier, _: ExecutionContext))
+      .getGroupUsers(_: String)(using _: RequestHeader, _: ExecutionContext))
       .expects(groupId, *, *)
       .returning(Future.successful(seqUserDetail))
 

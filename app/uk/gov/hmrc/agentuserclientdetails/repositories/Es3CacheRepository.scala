@@ -21,11 +21,12 @@ import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.IndexModel
 import org.mongodb.scala.model.IndexOptions
-import play.api.Logging
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Enrolment
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.Es3Cache
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.SensitiveEnrolment
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.crypto.Decrypter
 import uk.gov.hmrc.crypto.Encrypter
 import uk.gov.hmrc.crypto.PlainText
@@ -46,7 +47,7 @@ extends Es3CacheRepositoryTestDeleteTrait {
   def put(
     groupId: String,
     clients: Seq[Enrolment]
-  ): Future[Es3Cache]
+  )(using rh: RequestHeader): Future[Es3Cache]
   def get(groupId: String): Future[Option[Es3Cache]]
 
 }
@@ -81,7 +82,7 @@ extends PlayMongoRepository[Es3Cache](
 )
 with Es3CacheRepository
 with Es3CacheRepositoryTestDeleteTrait
-with Logging {
+with RequestAwareLogging {
 
   override lazy val requiresTtlIndex = false
 
@@ -99,7 +100,7 @@ with Logging {
     groupId: String,
     savedCount: Int,
     documents: Seq[Es3Cache]
-  ): Unit = {
+  )(using rh: RequestHeader): Unit = {
 
     if (savedCount == documents.size) {
       logger.info(s"Inserted $savedCount documents for $groupId")
@@ -112,7 +113,7 @@ with Logging {
   override def put(
     groupId: String,
     clients: Seq[Enrolment]
-  ): Future[Es3Cache] = {
+  )(using rh: RequestHeader): Future[Es3Cache] = {
     val timestamp = timestampSupport.timestamp()
 
     val es3Cache = Es3Cache(

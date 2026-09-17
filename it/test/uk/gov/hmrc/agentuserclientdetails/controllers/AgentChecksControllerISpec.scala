@@ -21,6 +21,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.JsArray
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers
@@ -39,6 +40,7 @@ import uk.gov.hmrc.agentuserclientdetails.repositories.*
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.SensitiveClient
 import uk.gov.hmrc.agentuserclientdetails.services.*
 import uk.gov.hmrc.agentuserclientdetails.stubs.*
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -54,6 +56,8 @@ with MongoSupport
 with EnrolmentStoreProxyConnectorStub
 with UsersGroupsSearchConnectorStub
 with BeforeAndAfterEach {
+
+  given RequestHeader = NoRequest
 
   private val arn: Arn = Arn(arnStr)
   private val groupId = "groupId"

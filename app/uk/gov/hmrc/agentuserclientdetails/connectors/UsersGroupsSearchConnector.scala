@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.agentuserclientdetails.connectors
 
-import play.api.Logging
 import play.api.http.Status
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.UserDetails
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpErrorFunctions
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+import uk.gov.hmrc.agentuserclientdetails.util.RequestSupport.hc
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,12 +44,12 @@ class UsersGroupsSearchConnector @Inject() (
   val ec: ExecutionContext
 )
 extends HttpErrorFunctions
-with Logging {
+with RequestAwareLogging {
 
   def getGroupUsers(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Seq[UserDetails]] = {
     val url = url"${appConfig.userGroupsSearchUrl}/users-groups-search/groups/$groupId/users"

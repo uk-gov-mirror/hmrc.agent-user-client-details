@@ -17,13 +17,13 @@
 package uk.gov.hmrc.agentuserclientdetails.services
 
 import com.google.inject.ImplementedBy
-import play.api.Logging
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Client
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Enrolment
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.Es3Cache
 import uk.gov.hmrc.agentuserclientdetails.repositories.Es3CacheRepository
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 
 import java.net.URLDecoder
 import javax.inject.Inject
@@ -37,14 +37,14 @@ trait ES3CacheService {
   def fetchClientsAndPoupluateCacheIfEmpty(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     executionContext: ExecutionContext
   ): Future[Seq[Client]]
 
   def refreshIfGroupIdExist(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     executionContext: ExecutionContext
   ): Future[Option[Unit]]
 
@@ -56,12 +56,12 @@ class ES3CacheServiceImpl @Inject() (
   es3CacheRepository: Es3CacheRepository
 )
 extends ES3CacheService
-with Logging {
+with RequestAwareLogging {
 
   override def fetchClientsAndPoupluateCacheIfEmpty(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     executionContext: ExecutionContext
   ): Future[Seq[Client]] = {
 
@@ -82,14 +82,14 @@ with Logging {
   override def refreshIfGroupIdExist(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     executionContext: ExecutionContext
   ): Future[Option[Unit]] = es3CacheRepository
     .get(groupId)
     .map(_.map(_ => fetchEs3ClientsAndPersist(groupId)).map(_ => ()))
 
   private def fetchEs3ClientsAndPersist(groupId: String)(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Es3Cache] =
     for {

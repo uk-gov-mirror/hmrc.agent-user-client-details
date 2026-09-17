@@ -17,11 +17,12 @@
 package uk.gov.hmrc.agentuserclientdetails.auth
 
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import play.api.Configuration
 import play.api.Environment
-import play.api.Logging
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
@@ -45,7 +46,7 @@ class AuthAction @Inject() (
   val config: Configuration
 )
 extends AuthorisedFunctions
-with Logging {
+with RequestAwareLogging {
 
   private val agentEnrolment = "HMRC-AS-AGENT"
   private val agentReferenceNumberIdentifier = "AgentReferenceNumber"
@@ -98,7 +99,7 @@ with Logging {
       Arn(identifier.value)
     )
 
-  private def failureHandler(triedResult: Try[Option[AuthorisedAgent]]): Future[Option[AuthorisedAgent]] =
+  private def failureHandler(triedResult: Try[Option[AuthorisedAgent]])(using rh: RequestHeader): Future[Option[AuthorisedAgent]] =
     triedResult match {
       case Success(maybeAuthorisedAgent) => Future.successful(maybeAuthorisedAgent)
       case Failure(ex) =>

@@ -22,16 +22,19 @@ import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import play.api.Logging
+import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentuserclientdetails.model.FriendlyNameWorkItem
 import uk.gov.hmrc.agentuserclientdetails.repositories.storagemodel.SensitiveClient
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.agentuserclientdetails.util.StatusUtil
+import uk.gov.hmrc.agentuserclientdetails.util.RequestSupport.hc
 import uk.gov.hmrc.clusterworkthrottling.Rate
 import uk.gov.hmrc.clusterworkthrottling.ServiceInstances
 import uk.gov.hmrc.clusterworkthrottling.ThrottledWorkItemProcessor
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.SessionId
+import uk.gov.hmrc.http.HeaderNames
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.*
 import uk.gov.hmrc.mongo.workitem.WorkItem
@@ -113,7 +116,11 @@ extends Logging {
    Main logic
    */
   def processItem(workItem: WorkItem[FriendlyNameWorkItem]): Future[Unit] = {
-    given HeaderCarrier = HeaderCarrier().copy(sessionId = workItem.item.sessionId.map(SessionId.apply))
+    given Request[Any] =
+      workItem.item.sessionId match {
+        case Some(sessionId) => NoRequest(Map(HeaderNames.xSessionId -> sessionId))
+        case None => NoRequest
+      }
     val groupId = workItem.item.groupId
     val friendlyName = workItem.item.client.decryptedValue.friendlyName
     val enrolmentKey = workItem.item.client.decryptedValue.enrolmentKey
@@ -262,7 +269,8 @@ extends Logging {
     groupId: String,
     enrolmentKey: String,
     friendlyName: String
-  )(using hc: HeaderCarrier): Future[Unit] = {
+  )(using request: RequestHeader): Future[Unit] = {
+
     // return a Future[Option[Throwable]] instead of a failed future because the throttler library
     // doesn't seem to throttle failed futures correctly.
     val es19CompatibleFriendlyName = URLEncoder.encode(friendlyName, "UTF-8")

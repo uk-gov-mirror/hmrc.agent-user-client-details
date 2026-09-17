@@ -22,6 +22,7 @@ import play.api.Configuration
 import play.api.libs.json.*
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.agentuserclientdetails.model.*
@@ -34,6 +35,7 @@ import uk.gov.hmrc.agentuserclientdetails.model.FriendlyNameWorkItem
 import uk.gov.hmrc.agentuserclientdetails.repositories.FriendlyNameWorkItemRepository
 import uk.gov.hmrc.agentuserclientdetails.services.FriendlyNameWorkItemServiceImpl
 import uk.gov.hmrc.agentuserclientdetails.stubs.AuthorisationMockSupport
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -63,7 +65,7 @@ with AuthorisationMockSupport {
   given AuthConnector = mock[AuthConnector]
   given AuthAction = app.injector.instanceOf[AuthAction]
 
-  given HeaderCarrier = HeaderCarrier()
+  given RequestHeader = NoRequest
   val testGroupId = "2K6H-N1C1-7M7V-O4A3"
   val anotherTestGroupId = "8R6G-J5B5-0U1Q-N8R2"
   val testArn = Arn("BARN9706518")
@@ -96,7 +98,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
       (esp
@@ -104,7 +106,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
       val request = FakeRequest("POST", "").withBody(Json.toJson(clientsWithFriendlyNames))
@@ -125,7 +127,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
       (esp
@@ -133,7 +135,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(
           *,
           client4.enrolmentKey,
@@ -147,7 +149,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
       val request = FakeRequest("POST", "").withBody(Json.toJson(clientsWithFriendlyNames))
@@ -170,7 +172,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
       (esp
@@ -178,7 +180,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(
           *,
           client2.enrolmentKey,
@@ -192,7 +194,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
       val request = FakeRequest("POST", "").withBody(Json.toJson(clientsWithFriendlyNames))
@@ -213,7 +215,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
       (esp
@@ -221,7 +223,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
       val request = FakeRequest("POST", "").withBody(Json.toJson(Seq.fill(100)(client1))) // 100 enrolments to process
@@ -244,7 +246,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
       val request = FakeRequest("POST", "").withBody(Json.obj("someJson" -> JsNumber(0xbad)))
@@ -262,7 +264,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(None))
       val request = FakeRequest("POST", "").withBody(Json.toJson(clientsWithFriendlyNames))
@@ -285,7 +287,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
       (esp
@@ -293,7 +295,7 @@ with AuthorisationMockSupport {
           _: String,
           _: String,
           _: String
-        )(using _: HeaderCarrier, _: ExecutionContext))
+        )(using _: RequestHeader, _: ExecutionContext))
         .when(*, *, *, *, *)
         .returns(Future.successful(()))
       val request = FakeRequest("PUT", "").withBody(Json.parse(friendlyNameRequest))
@@ -314,7 +316,7 @@ with AuthorisationMockSupport {
       mockAuthResponseWithoutException(buildAuthorisedResponse)
       val esp = stub[EnrolmentStoreProxyConnector]
       (esp
-        .getPrincipalGroupIdFor(_: Arn)(using _: HeaderCarrier, _: ExecutionContext))
+        .getPrincipalGroupIdFor(_: Arn)(using _: RequestHeader, _: ExecutionContext))
         .when(testArn, *, *)
         .returns(Future.successful(Some(testGroupId)))
 

@@ -19,11 +19,11 @@ package uk.gov.hmrc.agentuserclientdetails.connectors
 import com.google.inject.ImplementedBy
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Source
-import play.api.Logging
 import play.api.http.Status
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.Service.*
 import uk.gov.hmrc.agentuserclientdetails.model.Arn
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Enrolment
@@ -32,6 +32,8 @@ import uk.gov.hmrc.agentuserclientdetails.model.Service
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
 import uk.gov.hmrc.agentuserclientdetails.model.ES19Request
 import uk.gov.hmrc.agentuserclientdetails.model.PaginatedEnrolments
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -42,6 +44,7 @@ import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+import uk.gov.hmrc.agentuserclientdetails.util.RequestSupport.hc
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -63,7 +66,7 @@ trait EnrolmentStoreProxyConnector {
 
   // ES1 - principal
   def getPrincipalGroupIdFor(arn: Arn)(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Option[String]]
 
@@ -71,7 +74,7 @@ trait EnrolmentStoreProxyConnector {
   def getEnrolmentsAssignedToUser(
     userId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Seq[Enrolment]]
 
@@ -79,7 +82,7 @@ trait EnrolmentStoreProxyConnector {
   def getEnrolmentsForGroupId(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     executionContext: ExecutionContext
   ): Future[Seq[Enrolment]]
 
@@ -107,14 +110,14 @@ trait EnrolmentStoreProxyConnector {
     enrolmentKey: String,
     friendlyName: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Unit]
 
   // ES21 - Query a group's delegated enrolments, returning information about the assigned agent users
   def getGroupDelegatedEnrolments(
     groupId: String
-  )(using hc: HeaderCarrier): Future[Option[GroupDelegatedEnrolments]]
+  )(using rh: RequestHeader): Future[Option[GroupDelegatedEnrolments]]
 
 }
 
@@ -128,7 +131,7 @@ class EnrolmentStoreProxyConnectorImpl @Inject() (
   val ec: ExecutionContext
 )
 extends EnrolmentStoreProxyConnector
-with Logging {
+with RequestAwareLogging {
 
   val espBaseUrl = url"${appConfig.enrolmentStoreProxyUrl}"
 
@@ -183,7 +186,7 @@ with Logging {
 
   // ES1 - principal
   def getPrincipalGroupIdFor(arn: Arn)(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Option[String]] = {
     val enrolmentKeyPrefix = "HMRC-AS-AGENT~AgentReferenceNumber"
@@ -224,7 +227,7 @@ with Logging {
   def getEnrolmentsAssignedToUser(
     userId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Seq[Enrolment]] = {
 
@@ -265,7 +268,7 @@ with Logging {
   override def getEnrolmentsForGroupId(
     groupId: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Seq[Enrolment]] = {
 
@@ -296,7 +299,7 @@ with Logging {
     groupId: String,
     startRecord: Int
   )(using
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[Option[PaginatedEnrolments]] = {
     val url =
       url"$espBaseUrl/enrolment-store-proxy/enrolment-store/groups/$groupId/enrolments?type=delegated&start-record=$startRecord&max-records=${appConfig.es3MaxRecordsFetchCount}"
@@ -331,7 +334,7 @@ with Logging {
         response.status match {
           case status if is2xx(status) =>
             if (status != Status.CREATED)
-              logger.warn(s"assignEnrolment: Expected 201 status, got other success status ($status)")
+              logger.warn(s"assignEnrolment: Expected 201 status, got other success status ($status)")(using NoRequest)
           case other =>
             throw UpstreamErrorResponse(
               s"Unexpected status on ES11 request: ${response.body}",
@@ -359,7 +362,7 @@ with Logging {
         response.status match {
           case status if is2xx(status) =>
             if (status != Status.NO_CONTENT)
-              logger.warn(s"assignEnrolment: Expected 204 status, got other success status ($status)")
+              logger.warn(s"assignEnrolment: Expected 204 status, got other success status ($status)")(using NoRequest)
           case other =>
             throw UpstreamErrorResponse(
               s"Unexpected status on ES12 request: ${response.body}",
@@ -377,7 +380,7 @@ with Logging {
     enrolmentKey: String,
     friendlyName: String
   )(using
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Unit] = {
     given Format[ES19Request] = ES19Request.format
@@ -407,7 +410,7 @@ with Logging {
   // ES21 - Query a group's delegated enrolments, returning information about the assigned agent users
   override def getGroupDelegatedEnrolments(
     groupId: String
-  )(using hc: HeaderCarrier): Future[Option[GroupDelegatedEnrolments]] = {
+  )(using rh: RequestHeader): Future[Option[GroupDelegatedEnrolments]] = {
     val url = url"$espBaseUrl/enrolment-store-proxy/enrolment-store/groups/$groupId/delegated"
 
     http

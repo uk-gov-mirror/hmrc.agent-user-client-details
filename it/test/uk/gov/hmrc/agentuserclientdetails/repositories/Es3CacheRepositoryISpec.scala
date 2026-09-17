@@ -17,9 +17,11 @@
 package uk.gov.hmrc.agentuserclientdetails.repositories
 
 import org.mongodb.scala.SingleObservableFuture
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Enrolment
 import uk.gov.hmrc.agentuserclientdetails.model.accessgroups.Identifier
 import uk.gov.hmrc.agentuserclientdetails.BaseIntegrationSpec
+import uk.gov.hmrc.agentuserclientdetails.support.NoRequest
 import uk.gov.hmrc.mongo.test.MongoSupport
 
 class Es3CacheRepositoryISpec
@@ -27,6 +29,7 @@ extends BaseIntegrationSpec
 with MongoSupport {
 
   lazy val es3CacheRepository = app.injector.instanceOf[Es3CacheRepositoryImpl]
+  given RequestHeader = NoRequest
 
   val groupId = "0R4C-G0G1-4M9Y-T7P0"
 

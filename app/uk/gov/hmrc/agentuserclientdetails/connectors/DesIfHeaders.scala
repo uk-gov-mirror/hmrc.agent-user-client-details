@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.agentuserclientdetails.connectors
 
-import play.api.Logging
 import uk.gov.hmrc.agentuserclientdetails.config.AppConfig
+import uk.gov.hmrc.agentuserclientdetails.util.RequestAwareLogging
 import uk.gov.hmrc.http.Authorization
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HeaderNames
@@ -33,7 +33,7 @@ case class HeadersConfig(
 )
 @Singleton
 class DesIfHeaders @Inject() (appConfig: AppConfig)
-extends Logging {
+extends RequestAwareLogging {
 
   private val Environment = "Environment"
   private val CorrelationId = "CorrelationId"
